@@ -4,7 +4,7 @@ import './App.css'
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 function App() {
-  const [addCounterResponse, setAddCounterResponse] = useState<string | null>(null);
+  // const [addCounterResponse, setAddCounterResponse] = useState<string | null>(null);
   const [counter, setCounter] = useState<string | null>(null);
 
   const fetchCounter = async () => {
@@ -29,15 +29,16 @@ function App() {
         method: 'POST',
       });
       if (!response.ok) {
-        setAddCounterResponse('Error fetching data from the API');
+        setCounter('Error fetching data from the API');
       } else {
         const data = await response.json();
-        setAddCounterResponse(JSON.stringify(data, null, 2)); // Display the response as a formatted JSON string
-        fetchCounter();
+        // setAddCounterResponse(JSON.stringify(data, null, 2)); // Display the response as a formatted JSON string
+        // fetchCounter();
+        setCounter(JSON.stringify(data, null, 2))
       }
     } catch (error) {
       console.log(error);
-      setAddCounterResponse('An error occurred while fetching data');
+      setCounter('An error occurred while fetching data');
     }
   };
 
@@ -54,9 +55,9 @@ function App() {
       </div>
       <div>
         <button onClick={handleAPIAddCounter}>Add Counter</button>
-        {addCounterResponse && (
+        {/* {addCounterResponse && (
           <pre>{addCounterResponse}</pre>
-        )}
+        )} */}
       </div>
     </div>
   );
