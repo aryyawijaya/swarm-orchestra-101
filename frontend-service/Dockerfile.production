@@ -1,0 +1,23 @@
+ARG ALPINE_VERSION=3.19
+
+# stage 1: build react+vite app
+FROM node:22.3.0-alpine${ALPINE_VERSION} as builder
+
+WORKDIR /build-stage
+
+COPY package*.json .
+
+RUN npm i
+
+COPY . .
+
+RUN npm run build
+
+# stage 2: production image
+FROM nginx:1.27.0-alpine${ALPINE_VERSION}
+
+WORKDIR /usr/share/nginx/html
+
+COPY --from=builder /build-stage/dist .
+
+CMD [ "nginx", "-g", "daemon off;" ]

@@ -1,0 +1,7 @@
+services:
+  frontend:
+    build:
+      context: ./frontend-service
+      dockerfile: Dockerfile.production
+    ports:
+      - 80:80
