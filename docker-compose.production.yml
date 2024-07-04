@@ -1,7 +1,18 @@
 services:
+  backend:
+    build:
+      context: ./backend-service
+      dockerfile: Dockerfile.production
+    restart: always
+
   frontend:
     build:
       context: ./frontend-service
       dockerfile: Dockerfile.production
+      args:
+        - "VITE_BACKEND_URL=${VITE_BACKEND_URL}"
     ports:
       - 80:80
+    depends_on:
+      - backend
+    restart: always

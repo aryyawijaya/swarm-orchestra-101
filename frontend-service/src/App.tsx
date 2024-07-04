@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css'
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+const API = import.meta.env.VITE_API || '';
 
 function App() {
   // const [addCounterResponse, setAddCounterResponse] = useState<string | null>(null);
@@ -9,7 +9,7 @@ function App() {
 
   const fetchCounter = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/counter`);
+      const response = await fetch(`${API}/counter`);
       console.log(response)
       if (!response.ok) {
         setCounter('Error fetching data from the API');
@@ -25,7 +25,7 @@ function App() {
 
   const handleAPIAddCounter = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/counter`, {
+      const response = await fetch(`${API}/counter`, {
         method: 'POST',
       });
       if (!response.ok) {

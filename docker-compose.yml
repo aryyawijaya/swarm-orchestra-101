@@ -1,6 +1,40 @@
 services:
+  db:
+    image: postgres:16.3-alpine3.19
+    volumes:
+      - db-dev:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_DB=swarm_orchestra_101
+    restart: always
+  
+  db-migration:
+    image: migrate/migrate:v4.17.1
+    volumes:
+      - ./backend-service/db/migrations:/migrations
+    command: ["-path=/migrations", "-database", "${POSTGRES_SOURCE}", "-verbose", "up"]
+    depends_on:
+      - db
+  
+  backend:
+    build:
+      context: ./backend-service
+    volumes:
+      - ./backend-service:/app
+    depends_on:
+      - db-migration
+    restart: always
+
   frontend:
     build:
       context: ./frontend-service
     ports:
       - 5173:5173
+    volumes:
+      - ./frontend-service:/app
+    depends_on:
+      - backend
+    restart: always
+
+volumes:
+  db-dev:

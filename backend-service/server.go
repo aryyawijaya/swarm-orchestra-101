@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -25,10 +24,10 @@ func setupRouter() *gin.Engine {
 	r := gin.Default()
 
 	// set up CORS
-	config := cors.DefaultConfig()
-	frontendOrigin := os.Getenv("FRONTEND")
-	config.AllowOrigins = []string{frontendOrigin}
-	r.Use(cors.New(config))
+	// config := cors.DefaultConfig()
+	// frontendOrigin := os.Getenv("FRONTEND")
+	// config.AllowOrigins = []string{frontendOrigin}
+	// r.Use(cors.New(config))
 
 	// Ping test
 	r.GET("/ping", func(c *gin.Context) {
@@ -48,7 +47,7 @@ func setupRouter() *gin.Engine {
 		}
 
 		// get counter from db
-		row := database.Db.QueryRow(`SELECT count FROM counter WHERE id = $1;`, 1)
+		row := database.Db.QueryRow(`SELECT count FROM counters WHERE id = $1;`, 1)
 		counter := 0
 		err = row.Scan(&counter)
 		if err != nil {
@@ -62,7 +61,7 @@ func setupRouter() *gin.Engine {
 		}
 
 		resp := gin.H{
-			"data":     gin.H{
+			"data": gin.H{
 				"counter": counter,
 			},
 			"hostname": hostname,
@@ -80,7 +79,7 @@ func setupRouter() *gin.Engine {
 		}
 
 		// + 1 counter in db
-		_, err = database.Db.Exec(`UPDATE counter SET count = count + 1 WHERE id = $1 RETURNING count;`, 1)
+		_, err = database.Db.Exec(`UPDATE counters SET count = count + 1 WHERE id = $1 RETURNING count;`, 1)
 		if err != nil {
 			fmt.Println(err)
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -92,7 +91,7 @@ func setupRouter() *gin.Engine {
 		}
 
 		// get updated counter
-		row := database.Db.QueryRow(`SELECT count FROM counter WHERE id = $1;`, 1)
+		row := database.Db.QueryRow(`SELECT count FROM counters WHERE id = $1;`, 1)
 		counter := 0
 		err = row.Scan(&counter)
 		if err != nil {
@@ -107,7 +106,7 @@ func setupRouter() *gin.Engine {
 
 		// counter := 0
 		resp := gin.H{
-			"data":     gin.H{
+			"data": gin.H{
 				"counter": counter,
 			},
 			"hostname": hostname,
@@ -120,9 +119,19 @@ func setupRouter() *gin.Engine {
 }
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	env := os.Getenv("APP_ENV")
+	fmt.Printf("environment: %s\n", env)
+	switch env {
+	case "production":
+		err := godotenv.Load(".env.production")
+		if err != nil {
+			log.Fatal("Error loading .env.production file")
+		}
+	default:
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
 	}
 
 	r := setupRouter()
