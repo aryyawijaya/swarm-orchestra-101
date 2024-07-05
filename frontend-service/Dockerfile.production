@@ -1,7 +1,7 @@
 ARG ALPINE_VERSION=3.19
 
 # stage 1: build react+vite app
-FROM node:22.3.0-alpine${ALPINE_VERSION} as builder
+FROM node:22.3.0-alpine${ALPINE_VERSION} AS builder
 
 WORKDIR /build-stage
 

@@ -1,0 +1,26 @@
+- name: Set static IP
+  hosts: all
+  become: true
+  tasks:
+    - name: Ensure NetworkManager is installed
+      ansible.builtin.apt:
+        name: network-manager
+        state: present
+        update_cache: true
+
+    - name: Restart NetworkManager
+      ansible.builtin.systemd:
+        name: NetworkManager
+        state: restarted
+
+    - name: Configure static IP using nmcli
+      community.general.nmcli:
+        conn_name: 'System enp0s3'
+        ifname: enp0s3
+        type: ethernet
+        ip4: '{{ TO_IP }}/24'
+        gw4: '{{ TO_GATEWAY }}'
+        dns4:
+          - 8.8.8.8
+          - 8.8.4.4
+        state: present

@@ -6,6 +6,8 @@ services:
     environment:
       - POSTGRES_PASSWORD=123
       - POSTGRES_DB=swarm_orchestra_101
+    ports:
+      - 5432:5432
     restart: always
   
   db-migration:
@@ -21,6 +23,8 @@ services:
       context: ./backend-service
     volumes:
       - ./backend-service:/app
+    ports:
+      - 8080:8080
     depends_on:
       - db-migration
     restart: always
