@@ -1,0 +1,10 @@
+- name: Configure netplan for static IP using template
+  ansible.builtin.template:
+    src: 01-netcfg.yaml.j2
+    dest: /etc/netplan/01-netcfg.yaml
+    mode: '0644'
+    backup: true
+
+- name: Apply netplan configuration
+  ansible.builtin.command: netplan apply
+  changed_when: false

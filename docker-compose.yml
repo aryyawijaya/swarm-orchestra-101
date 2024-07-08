@@ -3,21 +3,21 @@ services:
     image: postgres:16.3-alpine3.19
     volumes:
       - db-dev:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_PASSWORD=123
-      - POSTGRES_DB=swarm_orchestra_101
+    env_file: ".env"
     ports:
       - 5432:5432
     restart: always
-  
+
   db-migration:
     image: migrate/migrate:v4.17.1
     volumes:
       - ./backend-service/db/migrations:/migrations
-    command: ["-path=/migrations", "-database", "${POSTGRES_SOURCE}", "-verbose", "up"]
+    env_file: ".env"
+    command:
+      ['-path=/migrations', '-database', '${POSTGRES_SOURCE}', '-verbose', 'up']
     depends_on:
       - db
-  
+
   backend:
     build:
       context: ./backend-service

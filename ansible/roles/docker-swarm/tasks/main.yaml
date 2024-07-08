@@ -1,0 +1,79 @@
+# Leader node (groups['manager_nodes'][0])
+- name: Get swarm status
+  ansible.builtin.shell: >
+    docker info --format \{\{.Swarm.LocalNodeState\}\}
+  register: swarm_status
+  when: inventory_hostname == groups['manager_nodes'][0]
+  changed_when: false
+
+- name: Init swarm
+  ansible.builtin.shell: >
+    docker swarm init --advertise-addr {{ hostvars[inventory_hostname].ansible_host }}
+  when:
+    - inventory_hostname == groups['manager_nodes'][0]
+    - swarm_status.stdout == 'inactive'
+  changed_when: false
+
+- name: Get worker join-token
+  ansible.builtin.shell: >
+    docker swarm join-token -q worker
+  register: join_token_worker
+  when: inventory_hostname == groups['manager_nodes'][0]
+  changed_when: false
+
+# Worker nodes (groups['worker_nodes'])
+- name: Get worker swarm status
+  ansible.builtin.shell: >
+    docker info --format \{\{.Swarm.LocalNodeState\}\}
+  register: swarm_status
+  when: inventory_hostname in groups['worker_nodes']
+  changed_when: false
+
+- name: Join worker nodes
+  ansible.builtin.shell: >
+    docker swarm join \
+      --advertise-addr {{ hostvars[inventory_hostname].ansible_host }} \
+      --token {{ hostvars[groups['manager_nodes'][0]]['join_token_worker']['stdout'] }} \
+      {{ hostvars[groups['manager_nodes'][0]].ansible_host }}
+  when:
+    - inventory_hostname in groups['worker_nodes']
+    - swarm_status.stdout == 'inactive'
+  changed_when: false
+
+# Copy required files to manager nodes
+- name: Copy compose file to manager nodes
+  ansible.builtin.copy:
+    src: ../../../docker-compose.production.yml
+    dest: /app/
+    owner: root
+    group: root
+    mode: '0644'
+  when: inventory_hostname in groups['manager_nodes'][0]
+
+- name: Copy env production to manager nodes
+  ansible.builtin.copy:
+    src: ../../../.env.production
+    dest: /app/
+    owner: root
+    group: root
+    mode: '0644'
+  when: inventory_hostname in groups['manager_nodes'][0]
+
+- name: Export environment variables from .env.production
+  ansible.builtin.shell: >
+    set -a && \
+    source /app/.env.production && \
+    set +a
+  args:
+    executable: /bin/bash
+  when: inventory_hostname in groups['manager_nodes'][0]
+  changed_when: false
+
+- name: Copy database migration files
+  ansible.builtin.copy:
+    src: ../../../backend-service/db/
+    dest: /app/backend-service/db/
+    owner: root
+    group: root
+    mode: '0644'
+  when: inventory_hostname in groups['manager_nodes'][0]

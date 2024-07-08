@@ -1,9 +1,0 @@
-- name: Test
-  hosts: all
-  tasks:
-    - name: Test pingg
-      ansible.builtin.ping:
-    - name: Test command
-      ansible.builtin.file:
-        path: '/home/aryya/{{ file_name }}'
-        state: touch
