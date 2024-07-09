@@ -8,3 +8,7 @@
 - name: Apply netplan configuration
   ansible.builtin.command: netplan apply
   changed_when: false
+
+- name: Set hostname
+  ansible.builtin.hostname:
+    name: '{{ hostname }}'

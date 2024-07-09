@@ -1,0 +1,6 @@
+postgres_source: postgresql://postgres:123@db:5432/swarm_orchestra_101?sslmode=disable
+postgres_host: db
+postgres_port: 5432
+postgres_user: postgres
+postgres_db: swarm_orchestra_101
+postgres_password: 123

@@ -48,25 +48,48 @@
     owner: root
     group: root
     mode: '0644'
-  when: inventory_hostname in groups['manager_nodes'][0]
+  when: inventory_hostname in groups['manager_nodes']
 
-- name: Copy env production to manager nodes
+- name: Copy env production file
   ansible.builtin.copy:
     src: ../../../.env.production
     dest: /app/
     owner: root
     group: root
     mode: '0644'
-  when: inventory_hostname in groups['manager_nodes'][0]
+  when: inventory_hostname in groups['manager_nodes']
 
-- name: Export environment variables from .env.production
-  ansible.builtin.shell: >
-    set -a && \
-    source /app/.env.production && \
-    set +a
+- name: Ensure environment variables are present in /etc/environment
+  ansible.builtin.lineinfile:
+    path: /etc/environment
+    state: present
+    create: true
+    line: '{{ item }}'
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+    - 'POSTGRES_HOST={{ postgres_host }}'
+    - 'POSTGRES_PORT={{ postgres_port }}'
+    - 'POSTGRES_USER={{ postgres_user }}'
+    - 'POSTGRES_DB={{ postgres_db }}'
+    - 'POSTGRES_PASSWORD={{ postgres_password }}'
+    - 'POSTGRES_SOURCE={{ postgres_source }}'
+  when: inventory_hostname in groups['manager_nodes']
+
+- name: Apply the changes to the current session
+  ansible.builtin.shell: source /etc/environment
   args:
     executable: /bin/bash
-  when: inventory_hostname in groups['manager_nodes'][0]
+  when: inventory_hostname in groups['manager_nodes']
+  changed_when: false
+
+- name: Pull image from compose file
+  ansible.builtin.shell: >
+    docker compose -f docker-compose.production.yml pull
+  args:
+    chdir: /app
+  when: inventory_hostname in groups['manager_nodes']
   changed_when: false
 
 - name: Copy database migration files
@@ -76,4 +99,4 @@
     owner: root
     group: root
     mode: '0644'
-  when: inventory_hostname in groups['manager_nodes'][0]
+  when: inventory_hostname in groups['manager_nodes']
