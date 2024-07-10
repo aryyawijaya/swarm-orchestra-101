@@ -60,3 +60,8 @@
   ansible.builtin.file:
     path: /var/run/docker.sock
     mode: '0660'
+
+- name: Restart docker service
+  ansible.builtin.systemd:
+    name: docker
+    state: restarted
