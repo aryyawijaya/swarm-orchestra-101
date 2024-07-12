@@ -10,7 +10,7 @@ services:
         constraints: [node.role == manager]
 
   db-migration:
-    image: migrate/migrate:v4.17.1
+    image: aryyadocker/swarm-orchestra-101-db-migrate:1.0
     volumes:
       - ./backend-service/db/migrations:/migrations
     env_file: '.env.production'
@@ -23,7 +23,7 @@ services:
       placement:
         constraints: [node.role == manager]
       restart_policy:
-        condition: none
+        condition: on-failure
 
   backend:
     image: aryyadocker/swarm-orchestra-101-backend-production:1.0
