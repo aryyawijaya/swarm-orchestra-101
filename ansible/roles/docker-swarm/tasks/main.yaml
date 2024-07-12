@@ -84,14 +84,6 @@
   when: inventory_hostname in groups['manager_nodes']
   changed_when: false
 
-- name: Pull image from compose file
-  ansible.builtin.shell: >
-    docker compose -f docker-compose.production.yml pull
-  args:
-    chdir: /app
-  when: inventory_hostname in groups['manager_nodes']
-  changed_when: false
-
 - name: Copy database migration files
   ansible.builtin.copy:
     src: ../../../backend-service/db/
@@ -100,3 +92,11 @@
     group: root
     mode: '0644'
   when: inventory_hostname in groups['manager_nodes']
+
+- name: Pull image from compose file
+  ansible.builtin.shell: >
+    docker compose -f docker-compose.production.yml pull
+  args:
+    chdir: /app
+  when: inventory_hostname in groups['manager_nodes']
+  changed_when: false

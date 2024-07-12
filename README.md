@@ -23,27 +23,33 @@ ansible-playbook -i inventory.ini set-up-docker-swarm.yaml -K
 ## Deploy docker swarm
 At /app on swarm-orchestra-101-node1 VM, run this command:
 ```bash
-docker stack deploy -c docker-compose.production.yml swarm-orchestra-101
+docker stack deploy -d -c docker-compose.production.yml swarm-orchestra-101
 ```
 
 ## Inspect created services on stack
 
 ### 1. Using command line
 On swarm-orchestra-101-node1, run this command:
+#### a. Shows in each service about how many container replicas (RUNNING/DESIRED)
 ```bash
 docker stack services swarm-orchestra-101
 ```
-It shows in each service about how many container replicas (running/desired)
 ![stack-services](https://github.com/aryyawijaya/swarm-orchestra-101/blob/main/docs/stack-services.png)
 
+#### b. Shows in a service about on what node its container replicas running on
 ```bash
 docker service ps swarm-orchestra-101_backend
 ```
-It shows in 1 service about what node its container replicas running on
 ![service-ps](https://github.com/aryyawijaya/swarm-orchestra-101/blob/main/docs/service-ps.png)
 
+#### c. Shows database migration logs
+```bash
+docker service logs swarm-orchestra-101_db-migration
+```
+![db-migration](https://github.com/aryyawijaya/swarm-orchestra-101/blob/main/docs/db-migration.png)
+
 ### 2. Through visualizer swarm nodes
-Access swarm-orchestra-101-node1 using its IP through port 8080 (192.168.1.20:8080)
+On browser access swarm-orchestra-101-node1 using its IP through port 8080 (http://192.168.1.20:8080)
 ![visualizer-swarm-nodes](https://github.com/aryyawijaya/swarm-orchestra-101/blob/main/docs/visualizer-swarm-nodes.png)
 
 ## Demo
