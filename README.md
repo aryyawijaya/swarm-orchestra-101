@@ -1,6 +1,15 @@
 # swarm-orchestra-101
 Project that set up ready to launch Docker Swarm orchestration
 
+Also this project provides:
+- Best practice Dockerfile
+- Production grade docker compose file
+- Visualizer Docker Swarm nodes
+
+Maybe later will add:
+- Secret in Docker Swarm
+- Overriding docker compose file
+
 ## VM IP mapping
 | IP Address      | Hostname VM                  | Role in Docker Swarm    |
 | --------------- | ---------------------------- | ----------------------- |
